@@ -6,9 +6,7 @@ public class WorkerMover : MonoBehaviour
 {
     [SerializeField] private float _distanceToCheck;
     [SerializeField] private NavMeshAgent _agent;
-
-    // public event Action ArrivedDestination;
-
+    
     public void SetTarget(Vector3 target) =>
         MoveTo(target); 
 
