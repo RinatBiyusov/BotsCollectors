@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ResourcesSpawner : GenericSpawner<Resource>
+public class ResourcesSpawner : GenericSpawner<Ore>
 {
     [SerializeField] private float _delaySpawn;
     [SerializeField] private float _radiusSpawn = 20f;
@@ -35,10 +35,10 @@ public class ResourcesSpawner : GenericSpawner<Resource>
         return new Vector3(center.x + point2D.x, center.y, center.z + point2D.y);
     }
 
-    protected override void Release(Resource resource)
+    protected override void Release(Ore ore)
     {
-        base.Release(resource);
-        resource.Collected -= Release;
+        base.Release(ore);
+        ore.Collected -= Release;
     }
 
     private IEnumerator Spawn()
@@ -47,10 +47,10 @@ public class ResourcesSpawner : GenericSpawner<Resource>
         {
             if (_maxResourceCount > CountObjects())
             {
-                Resource resource = TakeObject();
-                resource.Collected += Release;
+                Ore ore = TakeObject();
+                ore.Collected += Release;
                 
-                resource.transform.position = GetRandomPointInCircle3D(transform.position);
+                ore.transform.position = GetRandomPointInCircle3D(transform.position);
             }
 
             yield return _waitForSeconds;
