@@ -1,7 +1,6 @@
-namespace Enum
+public enum OreType
 {
-    public class OreType
-    {
-        
-    }
+    Copper, 
+    Coal,
+    Gold
 }

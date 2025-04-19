@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DropZone : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (other.TryGetComponent(out Worker worker))
+        if (collider.TryGetComponent(out Worker worker))
             worker.DropResource();
     }
 }

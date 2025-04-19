@@ -1,26 +1,34 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ResourcesSpawner : GenericSpawner<Ore>
+public class OresSpawner : GenericSpawner<Ore>
 {
     [SerializeField] private float _delaySpawn;
     [SerializeField] private float _radiusSpawn = 20f;
     [SerializeField] private int _maxResourceCount = 7;
 
+    private readonly float _fullCircleRadians = Mathf.PI * 2f;
+
     private WaitForSeconds _waitForSeconds;
     private Vector2 _randomPositionOnCircle;
-    
+
     private void Start()
     {
         _waitForSeconds = new WaitForSeconds(_delaySpawn);
         StartCoroutine(Spawn());
     }
 
+
+    protected override void Release(Ore ore)
+    {
+        base.Release(ore);
+        ore.Collected -= Release;
+    }
+
     private Vector2 GetRandomPointOnCircle()
     {
-        float angle = Random.Range(0f, Mathf.PI * 2f);
+        float angle = Random.Range(0f, _fullCircleRadians);
         float distance = Random.Range(0f, _radiusSpawn);
 
         float x = Mathf.Cos(angle) * distance;
@@ -35,12 +43,6 @@ public class ResourcesSpawner : GenericSpawner<Ore>
         return new Vector3(center.x + point2D.x, center.y, center.z + point2D.y);
     }
 
-    protected override void Release(Ore ore)
-    {
-        base.Release(ore);
-        ore.Collected -= Release;
-    }
-
     private IEnumerator Spawn()
     {
         while (enabled)
@@ -49,7 +51,7 @@ public class ResourcesSpawner : GenericSpawner<Ore>
             {
                 Ore ore = TakeObject();
                 ore.Collected += Release;
-                
+
                 ore.transform.position = GetRandomPointInCircle3D(transform.position);
             }
 

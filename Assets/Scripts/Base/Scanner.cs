@@ -8,16 +8,15 @@ public class Scanner : MonoBehaviour
     [SerializeField] private int _size = 50;
 
     private Collider[] _colliders;
-    private readonly List<Resource> _resources = new List<Resource>();
 
     private void Start()
     {
         _colliders = new Collider[_size];
     }
 
-    public List<Resource> Scan()
+    public List<Ore> Scan()
     {
-        _resources.Clear();
+        List<Ore> ores = new List<Ore>();
         
         int hitCount = Physics.OverlapSphereNonAlloc(transform.position, _radiusScan, _colliders, _layerMask);
 
@@ -25,8 +24,8 @@ public class Scanner : MonoBehaviour
             return null;
         
         for (int i = 0; i < hitCount; i++)
-            _resources.Add(_colliders[i].GetComponent<Resource>());
+            ores.Add(_colliders[i].GetComponent<Ore>());
 
-        return _resources;
+        return ores;
     }
 }

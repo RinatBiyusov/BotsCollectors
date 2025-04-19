@@ -7,46 +7,45 @@ public class WorkerResourcesPicker : MonoBehaviour
 {
     [SerializeField] private Vector3 _holdOffset = new Vector3(0, 1.5f, 1f);
 
-    private Resource _heldObject;
-
-    public bool IsHoldsResource { get; private set; }
-
+    private Ore _heldObject;
+    private bool _isHoldsResource;
+    
     public event Action ResourcePicked;
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent(out Resource resource))
+        if (collision.gameObject.TryGetComponent(out Ore resource))
             PickUp(resource);
-    }
-
-    private void PickUp(Resource resource)
-    {
-        if (IsHoldsResource)
-            return;
-
-        _heldObject = resource;
-
-        if (resource != null)
-            resource.Rigidbody.isKinematic = true;
-
-        resource.transform.SetParent(transform);
-        resource.transform.localPosition = _holdOffset;
-
-        IsHoldsResource = true;
-
-        ResourcePicked?.Invoke();
     }
 
     public void Drop()
     {
-        if (!IsHoldsResource)
+        if (_isHoldsResource == false)
             return;
 
         _heldObject.transform.SetParent(null);
 
         _heldObject.Rigidbody.isKinematic = false;
-        
+
         _heldObject = null;
-        IsHoldsResource = false;
+        _isHoldsResource = false;
+    }
+    
+    private void PickUp(Ore ore)
+    {
+        if (_isHoldsResource)
+            return;
+
+        _heldObject = ore;
+
+        if (ore != null)
+            ore.Rigidbody.isKinematic = true;
+
+        ore.transform.SetParent(transform);
+        ore.transform.localPosition = _holdOffset;
+
+        _isHoldsResource = true;
+
+        ResourcePicked?.Invoke();
     }
 }

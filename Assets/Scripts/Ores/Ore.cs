@@ -2,11 +2,15 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Resource : MonoBehaviour
+public class Ore : MonoBehaviour
 {
+    [SerializeField] private OreType _type;    
+    
+    public  OreType Type => _type;
+     
     private Rigidbody _rigidbody;
 
-    public event Action<Resource> Collected;
+    public event Action<Ore> Collected;
 
     public Rigidbody Rigidbody { get; private set; }
 

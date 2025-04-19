@@ -1,11 +1,9 @@
 using System;
 using UnityEngine;
 
-public class ResourceEventDispatcher : MonoBehaviour, IObserverOres
+public class OreEventDispatcher : MonoBehaviour
 {
-    [SerializeField] private WarehouseOres _wareHouse;
-
-    protected WarehouseOres WareHouse => _wareHouse;
+    [SerializeField] private WarehouseOre _wareHouse;
 
     public event Action<OreType, int> Changed;
 
@@ -19,8 +17,6 @@ public class ResourceEventDispatcher : MonoBehaviour, IObserverOres
         _wareHouse.Collected -= UpdateOres;
     }
 
-    public void UpdateOres(OreType type, int amount)
-    {
+    private void UpdateOres(OreType type, int amount) =>
         Changed?.Invoke(type, amount);
-    }
 }
