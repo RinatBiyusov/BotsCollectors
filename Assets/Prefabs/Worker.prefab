@@ -1079,6 +1079,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _holdOffset: {x: 0, y: 1.5, z: 1}
+  _ownerWorker: {fileID: -8633593502199392843}
 --- !u!114 &-2167993986712952024
 MonoBehaviour:
   m_ObjectHideFlags: 0

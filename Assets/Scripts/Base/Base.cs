@@ -1,59 +1,108 @@
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Base : MonoBehaviour
 {
-    [SerializeField] private Scanner _scanner;
+    [Header("Core Components")] [SerializeField]
+    private Scanner _scanner;
+
     [SerializeField] private OreCollector _oreCollector;
     [SerializeField] private WarehouseOre _warehouseOre;
     [SerializeField] private WorkersSpawner _workersSpawner;
-    [SerializeField] private BaseControlPanelUI _controlPanelUI;
+
+    
+    [Header("Settings")] [SerializeField] private int _maxAmountWorkers;
+    [SerializeField] private Transform[] _workersSpawnPoints;
+
+    [Header("UI Invokers")] [SerializeField]
+    private UIButtonInvoker _buttonSendToWork;
+
+    [SerializeField] private UIButtonInvoker _buttonHireWorker;
+    [SerializeField] private UIButtonInvoker _buttonSetFlag;
 
     private readonly List<Worker> _workers = new List<Worker>();
     private List<Ore> _ores = new List<Ore>();
+    
+    private void Awake()
+    {
+        _buttonSendToWork.Bind(new SendWorkersCommand(this));
+        _buttonHireWorker.Bind(new HireWorkerCommand(this));
+        // _buttonSetFlag.Bind(new SetFlagCommand(this));
+    }
 
     private void OnEnable()
     {
-        _controlPanelUI.PlayButtonClicked += DistributeWorkers;
         _workersSpawner.WorkerSpawned += AddWorker;
+        Game.GameStarted += GameOnGameStarted;
     }
 
     private void OnDisable()
     {
-        _controlPanelUI.PlayButtonClicked -= DistributeWorkers;
         _workersSpawner.WorkerSpawned -= AddWorker;
+        Game.GameStarted -= GameOnGameStarted;
 
         foreach (Worker worker in _workers)
             worker.ResourceCollected -= SendWorkerToWareHouse;
     }
 
-    private void DistributeWorkers()
+    private void GameOnGameStarted() =>
+        _workersSpawner.Init(this);
+
+    public void DistributeWorkers()
     {
-        FindResources();
+        _ores = _scanner.Scan();
 
         if (_ores.Count == 0)
             return;
 
-        for (int i = 0; i < _workers.Count; i++)
+        foreach (Worker worker in _workers)
         {
-            if (_workers[i].IsWorking || _ores[i] == null)
+            if (worker.IsWorking)
                 continue;
 
-            _workers[i].DefineJob(_ores[i].transform.position);
-            _workers[i].ResourceCollected += SendWorkerToWareHouse;
+            Ore targetOre = GetFreeOre();
+
+            if (targetOre == null)
+                break;
+
+            targetOre.WorkerTarget.SetTarget(worker);
+            worker.DefineJob(targetOre.transform.position);
+            worker.ResourceCollected -= SendWorkerToWareHouse;
+            worker.ResourceCollected += SendWorkerToWareHouse;
         }
     }
 
-    private void FindResources()
+    public void HireWorker()
     {
-        _ores.Clear();
-        _ores = _scanner.Scan();
+        if (_workers.Count >= _maxAmountWorkers)
+            return;
+
+        _workersSpawner.HireWorker(this);
+    }
+    
+    private Ore GetFreeOre()
+    {
+        foreach (var ore in _ores)
+        {
+            if (ore != null && !ore.WorkerTarget.HasAssignedWorker())
+                return ore;
+        }
+
+        return null;
     }
 
     private void SendWorkerToWareHouse(Worker worker) =>
         worker.DefineJob(_oreCollector.transform.position);
 
-    private void AddWorker(Worker worker) =>
+    private void AddWorker(Worker worker)
+    {
+        if (worker.IsOwnerOf(this) == false)
+            return;
+
+        worker.Init(_workersSpawnPoints[_workers.Count].position);
+        worker.transform.position = _workersSpawnPoints[_workers.Count].position;
         _workers.Add(worker);
+    }
 }

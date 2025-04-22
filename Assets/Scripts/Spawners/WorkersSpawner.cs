@@ -3,23 +3,26 @@ using System;
 
 public class WorkersSpawner : GenericSpawner<Worker>
 {
-    [SerializeField] private Transform[] _spawnPoints;
     [SerializeField] private int _startAmountWorkers = 3;
 
     public event Action<Worker> WorkerSpawned;
 
-    private void Start()
+    public void Init(Base baseInstance)
     {
         for (int i = 0; i < _startAmountWorkers; i++)
         {
-            if (_spawnPoints[i] == null)
-                break;
-
             Worker worker = TakeObject();
+            worker.SetOwner(baseInstance);
             WorkerSpawned?.Invoke(worker);
-            worker.Init(_spawnPoints[i].position);
-            worker.transform.position = _spawnPoints[i].position;
-            worker.transform.rotation = Quaternion.identity;
         }
+    }
+
+    public Worker HireWorker(Base baseInstance)
+    {
+        Worker worker = TakeObject();
+        worker.SetOwner(baseInstance);
+        WorkerSpawned?.Invoke(worker);
+        
+        return worker;
     }
 }

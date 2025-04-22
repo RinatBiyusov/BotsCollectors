@@ -18,8 +18,7 @@ public class OresSpawner : GenericSpawner<Ore>
         _waitForSeconds = new WaitForSeconds(_delaySpawn);
         StartCoroutine(Spawn());
     }
-
-
+    
     protected override void Release(Ore ore)
     {
         base.Release(ore);
