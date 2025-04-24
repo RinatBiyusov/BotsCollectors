@@ -17,12 +17,10 @@ public class WorkersSpawner : GenericSpawner<Worker>
         }
     }
 
-    public Worker HireWorker(Base baseInstance)
+    public void HireWorker(Base baseInstance)
     {
         Worker worker = TakeObject();
         worker.SetOwner(baseInstance);
         WorkerSpawned?.Invoke(worker);
-        
-        return worker;
     }
 }

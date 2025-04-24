@@ -1,7 +1,9 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class WarehouseOre : MonoBehaviour
 {
@@ -11,7 +13,7 @@ public class WarehouseOre : MonoBehaviour
     private Dictionary<OreType, OreStrategy> _strategyMap;
     private Dictionary<OreType, int> _counterMap;
 
-    public event Action<OreType, int> Collected;
+    public event Action<OreType, int> Changed;
 
     private void Awake()
     {
@@ -34,10 +36,19 @@ public class WarehouseOre : MonoBehaviour
         if (_counterMap.TryGetValue(oreType, out int currentAmount))
         {
             _counterMap[oreType] = currentAmount + 1;
-            Collected?.Invoke(oreType, _counterMap[oreType]);
+            Changed?.Invoke(oreType, _counterMap[oreType]);
         }
     }
-    
+
+    public void SpendOre(OreType oreType, int amount)
+    {
+        _counterMap[oreType] -= amount;
+        Changed?.Invoke(oreType, _counterMap[oreType]);
+    }
+
+    public ReadOnlyDictionary<OreType, int> CountAmountOre() =>
+        new ReadOnlyDictionary<OreType, int>(_counterMap);
+
     private void ReceiveResource(Ore ore)
     {
         if (_strategyMap.TryGetValue(ore.Type, out var strategy))

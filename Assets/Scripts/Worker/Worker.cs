@@ -9,13 +9,17 @@ public class Worker : MonoBehaviour
 
     private Vector3 _startPosition;
     private Base _ownerBase;
+    private Transform _flagTarget;
 
     public event Action<Worker> ResourceCollected;
 
+    public int NumberIndex { get; private set; }
     public bool IsWorking { get; private set; }
+    public bool IsPlacingFlag { get; private set; }
 
-    public void Init(Vector3 startPosition)
+    public void Init(Vector3 startPosition, int numberSpawn)
     {
+        NumberIndex = numberSpawn;
         _startPosition = startPosition;
     }
 
@@ -29,9 +33,14 @@ public class Worker : MonoBehaviour
         _workerResourcesPicker.OrePicked -= BringOres;
     }
 
-    public void SetOwner(Base baseInstance)
+    public void SetFlagTarget(Transform flagTransform)
     {
-        _ownerBase = baseInstance;
+        if (flagTransform == null) return;
+
+        IsWorking = true;
+        _flagTarget = flagTransform;
+        _workerMover.SetTarget(flagTransform.position);
+        _workerMover.FlagTargetReached += CreateNewBase;
     }
 
     public void DefineJob(Vector3 target)
@@ -47,11 +56,33 @@ public class Worker : MonoBehaviour
         IsWorking = false;
     }
 
+    public void SetOwner(Base baseInstance) =>
+        _ownerBase = baseInstance;
+
+    public void AssignToSetFlag() =>
+        IsPlacingFlag = true;
+
     public bool IsOwnerOf(Base baseInstance) =>
         baseInstance == _ownerBase;
 
     public bool HasResource() =>
         _workerResourcesPicker.IsHoldingResource();
+
+    private void CreateNewBase()
+    {
+        _workerMover.FlagTargetReached -= CreateNewBase;
+        Base newBase = Instantiate(_ownerBase, _flagTarget.position, Quaternion.identity);
+
+        newBase.ClearFlag();
+        newBase.ClearWorkers();
+        _ownerBase.RemoveWorker(this);
+        
+        SetOwner(newBase);
+        newBase.AddWorker(this);
+        
+        _workerMover.SetTarget(_startPosition);
+        IsWorking = false;
+    }
 
     private void BringOres() =>
         ResourceCollected?.Invoke(this);

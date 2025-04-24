@@ -104,9 +104,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scanner: {fileID: 973098044277077451}
+  _placementHandler: {fileID: 5850488235353125957, guid: e2e39724e40eaaf4bbbad4996945d731, type: 3}
   _oreCollector: {fileID: 1981019513521810217}
   _warehouseOre: {fileID: 8110474981657938323}
-  _workersSpawner: {fileID: 0}
+  _workersSpawner: {fileID: 22762626626251757, guid: 24f304aec80c50349a0b9e9ace22b88e, type: 3}
   _maxAmountWorkers: 5
   _workersSpawnPoints:
   - {fileID: 1943083961017703716}
@@ -1031,7 +1032,7 @@ Transform:
   m_GameObject: {fileID: 4502148705202558156}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.2, y: 9.07, z: 59.1}
+  m_LocalPosition: {x: 0, y: 9.07, z: -4.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

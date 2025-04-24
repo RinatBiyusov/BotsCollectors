@@ -9,9 +9,6 @@ public class HireWorkerCommand : ICommand
         _base = baseInstance;
     }
 
-    public void Execute()
-    {
+    public void Execute() =>
         _base.HireWorker();
-        Debug.Log("Hire Worker");
-    }
 }

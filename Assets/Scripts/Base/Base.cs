@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -8,11 +11,11 @@ public class Base : MonoBehaviour
     [Header("Core Components")] [SerializeField]
     private Scanner _scanner;
 
+    [SerializeField] private FlagPlacementHandler _placementHandler;
     [SerializeField] private OreCollector _oreCollector;
     [SerializeField] private WarehouseOre _warehouseOre;
     [SerializeField] private WorkersSpawner _workersSpawner;
 
-    
     [Header("Settings")] [SerializeField] private int _maxAmountWorkers;
     [SerializeField] private Transform[] _workersSpawnPoints;
 
@@ -22,14 +25,21 @@ public class Base : MonoBehaviour
     [SerializeField] private UIButtonInvoker _buttonHireWorker;
     [SerializeField] private UIButtonInvoker _buttonSetFlag;
 
-    private readonly List<Worker> _workers = new List<Worker>();
+    private readonly int _costToCreateWorker = 3;
+    private readonly int _costToCreateBase = 5;
+    private Worker[] _workers = new Worker[5];
+
     private List<Ore> _ores = new List<Ore>();
-    
+
+    public Flag CurrentFlag { get; private set; }
+
     private void Awake()
     {
+        _workers = new Worker[_maxAmountWorkers];
+
         _buttonSendToWork.Bind(new SendWorkersCommand(this));
         _buttonHireWorker.Bind(new HireWorkerCommand(this));
-        // _buttonSetFlag.Bind(new SetFlagCommand(this));
+        _buttonSetFlag.Bind(new SetFlagCommand(this, _placementHandler));
     }
 
     private void OnEnable()
@@ -44,11 +54,19 @@ public class Base : MonoBehaviour
         Game.GameStarted -= GameOnGameStarted;
 
         foreach (Worker worker in _workers)
+        {
+            if (worker == null)
+                continue;
+
             worker.ResourceCollected -= SendWorkerToWareHouse;
+        }
     }
 
     private void GameOnGameStarted() =>
         _workersSpawner.Init(this);
+
+    public void InitNewBase(Worker worker) =>
+        AddWorker(worker);
 
     public void DistributeWorkers()
     {
@@ -59,6 +77,9 @@ public class Base : MonoBehaviour
 
         foreach (Worker worker in _workers)
         {
+            if (worker == null)
+                continue;
+
             if (worker.IsWorking)
                 continue;
 
@@ -74,12 +95,91 @@ public class Base : MonoBehaviour
         }
     }
 
-    public void HireWorker()
+    public bool CanBuildBase()
     {
-        if (_workers.Count >= _maxAmountWorkers)
+        ReadOnlyDictionary<OreType, int> amountOres = _warehouseOre.CountAmountOre();
+
+        foreach (var map in amountOres)
+        {
+            if (map.Value >= _costToCreateBase)
+            {
+                _warehouseOre.SpendOre(map.Key, _costToCreateBase);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void SetFlag(Flag flag) =>
+        CurrentFlag = flag;
+
+    public void ClearFlag() =>
+        CurrentFlag = null;
+
+    public void SendWorkerToCreateNewBase()
+    {
+        Worker worker = TakeFreeWorker();
+
+        if (worker == null)
             return;
 
-        _workersSpawner.HireWorker(this);
+        worker.AssignToSetFlag();
+        worker.SetFlagTarget(CurrentFlag.transform);
+    }
+
+    public void HireWorker()
+    {
+        int countNotNull = _workers.Count(worker => worker != null);
+
+        if (countNotNull == _maxAmountWorkers)
+            return;
+
+        ReadOnlyDictionary<OreType, int> amountOres = _warehouseOre.CountAmountOre();
+
+        foreach (var map in amountOres)
+        {
+            if (map.Value >= _costToCreateWorker)
+            {
+                _warehouseOre.SpendOre(map.Key, _costToCreateWorker);
+                _workersSpawner.HireWorker(this);
+                break;
+            }
+        }
+    }
+
+    public void AddWorker(Worker worker)
+    {
+        Debug.Log(worker.IsOwnerOf(this));
+        
+        if (worker.IsOwnerOf(this) == false)
+            return;
+
+        int index = Array.FindIndex(_workers, workerInstance => workerInstance == null);
+
+        Debug.Log(index);
+        
+        worker.Init(_workersSpawnPoints[index].position, index);
+        worker.transform.position = _workersSpawnPoints[index].position;
+        
+
+        _workers[worker.NumberIndex] = worker;
+    }
+
+    public void ClearWorkers() =>
+        Array.Clear(_workers, 0, _workers.Length);
+
+    public void RemoveWorker(Worker worker)
+    {
+        for (int i = 0; i < _workers.Length; i++)
+        {
+            if (_workers[i] == worker)
+            {
+                Debug.Log(i);
+                _workers[i] = null;
+                break;
+            }
+        }
     }
     
     private Ore GetFreeOre()
@@ -96,13 +196,14 @@ public class Base : MonoBehaviour
     private void SendWorkerToWareHouse(Worker worker) =>
         worker.DefineJob(_oreCollector.transform.position);
 
-    private void AddWorker(Worker worker)
+    private Worker TakeFreeWorker()
     {
-        if (worker.IsOwnerOf(this) == false)
-            return;
+        foreach (var worker in _workers)
+        {
+            if (worker.IsWorking == false)
+                return worker;
+        }
 
-        worker.Init(_workersSpawnPoints[_workers.Count].position);
-        worker.transform.position = _workersSpawnPoints[_workers.Count].position;
-        _workers.Add(worker);
+        return null;
     }
 }

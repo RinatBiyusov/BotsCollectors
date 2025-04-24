@@ -9,12 +9,12 @@ public class OreEventDispatcher : MonoBehaviour
 
     private void OnEnable()
     {
-        _wareHouse.Collected += UpdateOres;
+        _wareHouse.Changed += UpdateOres;
     }
 
     private void OnDisable()
     {
-        _wareHouse.Collected -= UpdateOres;
+        _wareHouse.Changed -= UpdateOres;
     }
 
     private void UpdateOres(OreType type, int amount) =>
