@@ -150,19 +150,14 @@ public class Base : MonoBehaviour
 
     public void AddWorker(Worker worker)
     {
-        Debug.Log(worker.IsOwnerOf(this));
-        
         if (worker.IsOwnerOf(this) == false)
             return;
 
         int index = Array.FindIndex(_workers, workerInstance => workerInstance == null);
-
-        Debug.Log(index);
         
         worker.Init(_workersSpawnPoints[index].position, index);
         worker.transform.position = _workersSpawnPoints[index].position;
         
-
         _workers[worker.NumberIndex] = worker;
     }
 
