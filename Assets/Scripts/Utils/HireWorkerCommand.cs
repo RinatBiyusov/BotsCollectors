@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class HireWorkerCommand : ICommand
 {
     private readonly Base _base;

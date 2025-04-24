@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Base : MonoBehaviour
@@ -64,10 +62,7 @@ public class Base : MonoBehaviour
 
     private void GameOnGameStarted() =>
         _workersSpawner.Init(this);
-
-    public void InitNewBase(Worker worker) =>
-        AddWorker(worker);
-
+    
     public void DistributeWorkers()
     {
         _ores = _scanner.Scan();
