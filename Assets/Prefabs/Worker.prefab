@@ -957,6 +957,7 @@ GameObject:
   - component: {fileID: -8633593502199392843}
   - component: {fileID: 3196764817075415211}
   - component: {fileID: -2167993986712952024}
+  - component: {fileID: 6642731708426599392}
   m_Layer: 0
   m_Name: Worker
   m_TagString: Untagged
@@ -1066,6 +1067,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _workerMover: {fileID: -2167993986712952024}
   _workerResourcesPicker: {fileID: 3196764817075415211}
+  _workerBuilder: {fileID: 6642731708426599392}
 --- !u!114 &3196764817075415211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1094,6 +1096,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _distanceToCheck: 0
   _agent: {fileID: 958538140514916518}
+--- !u!114 &6642731708426599392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6685846568189023345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1dbb9a7724b69040bbce081c976d7da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _prefabBase: {fileID: 3775334697443430836, guid: fdd76efc4b1205f4fb6632bf52bd0f3a, type: 3}
+  _workerMover: {fileID: -2167993986712952024}
 --- !u!1 &8030246073779576432
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ public class Worker : MonoBehaviour
 {
     [SerializeField] private WorkerMover _workerMover;
     [SerializeField] private WorkerResourcesPicker _workerResourcesPicker;
+    [SerializeField] private WorkerBuilder _workerBuilder;
 
     private Vector3 _startPosition;
     private Base _ownerBase;
@@ -40,7 +41,7 @@ public class Worker : MonoBehaviour
         IsWorking = true;
         _flagTarget = flagTransform;
         _workerMover.SetTarget(flagTransform.position);
-        _workerMover.FlagTargetReached += CreateNewBase;
+        _workerMover.FlagTargetReached += BuildNewBase;
     }
 
     public void DefineJob(Vector3 target)
@@ -68,20 +69,13 @@ public class Worker : MonoBehaviour
     public bool HasResource() =>
         _workerResourcesPicker.IsHoldingResource();
 
-    private void CreateNewBase()
+    private void BuildNewBase()
     {
-        _workerMover.FlagTargetReached -= CreateNewBase;
-        Base newBase = Instantiate(_ownerBase, _flagTarget.position, Quaternion.identity);
-
-        newBase.ClearFlag();
-        newBase.ClearWorkers();
-        _ownerBase.RemoveWorker(this);
+        _workerMover.FlagTargetReached -= BuildNewBase;
         
-        SetOwner(newBase);
-        newBase.AddWorker(this);
-        
-        _workerMover.SetTarget(_startPosition);
         IsWorking = false;
+        _workerBuilder.BuildBase(this, _ownerBase, _flagTarget);
+        _workerMover.SetTarget(_startPosition);
     }
 
     private void BringOres() =>

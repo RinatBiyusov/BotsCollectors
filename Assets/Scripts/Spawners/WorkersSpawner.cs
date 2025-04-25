@@ -6,7 +6,7 @@ public class WorkersSpawner : GenericSpawner<Worker>
     [SerializeField] private int _startAmountWorkers = 3;
 
     public event Action<Worker> WorkerSpawned;
-
+    
     public void Init(Base baseInstance)
     {
         for (int i = 0; i < _startAmountWorkers; i++)

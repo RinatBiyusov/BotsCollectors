@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scanner: {fileID: 973098044277077451}
-  _placementHandler: {fileID: 5850488235353125957, guid: e2e39724e40eaaf4bbbad4996945d731, type: 3}
+  _placementHandler: {fileID: 4435702239983589443, guid: 33206b5aaf3b1ef4481e3a7f9773d2aa, type: 3}
   _oreCollector: {fileID: 1981019513521810217}
   _warehouseOre: {fileID: 8110474981657938323}
   _workersSpawner: {fileID: 22762626626251757, guid: 24f304aec80c50349a0b9e9ace22b88e, type: 3}

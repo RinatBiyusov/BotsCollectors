@@ -4,23 +4,22 @@ public class FlagPlacementHandler : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
     [SerializeField] private Flag _flagPrefab;
+    [SerializeField] private PlayerInput _playerInput;
 
     private Base _currentBase;
     private bool _isPlacingFlag = false;
 
-    private void Update()
+    private void OnEnable()
     {
-        if (_isPlacingFlag == false)
-            return;
-
-        if (Input.GetMouseButtonDown(1))
-            CancelPlacement();
-
-        if (Input.GetMouseButtonDown(0))
-            TryPlaceFlag();
+        _playerInput.LeftButtonClicked += TryPlaceFlag;
     }
 
-    public void StartPlacingFlag(Base targetBase)
+    private void OnDisable()
+    {
+        _playerInput.LeftButtonClicked -= TryPlaceFlag;
+    }
+
+    public void PlaceFlag(Base targetBase)
     {
         _currentBase = targetBase;
         _isPlacingFlag = true;
@@ -28,6 +27,9 @@ public class FlagPlacementHandler : MonoBehaviour
 
     private void TryPlaceFlag()
     {
+        if (_isPlacingFlag == false)
+            return;
+
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out RaycastHit hitInfo))
@@ -42,17 +44,12 @@ public class FlagPlacementHandler : MonoBehaviour
                     {
                         Flag newFlag = Instantiate(_flagPrefab, position, Quaternion.identity);
                         _currentBase.SetFlag(newFlag);
-                        
+
                         _isPlacingFlag = false;
                         _currentBase.SendWorkerToCreateNewBase();
                     }
                 }
-                else
-                    _currentBase.CurrentFlag.MoveFlag(position);
             }
         }
     }
-
-    private void CancelPlacement() =>
-        _isPlacingFlag = false;
 }

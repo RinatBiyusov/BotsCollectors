@@ -12,7 +12,6 @@ public class Base : MonoBehaviour
     [SerializeField] private FlagPlacementHandler _placementHandler;
     [SerializeField] private OreCollector _oreCollector;
     [SerializeField] private WarehouseOre _warehouseOre;
-    [SerializeField] private WorkersSpawner _workersSpawner;
 
     [Header("Settings")] [SerializeField] private int _maxAmountWorkers;
     [SerializeField] private Transform[] _workersSpawnPoints;
@@ -24,8 +23,9 @@ public class Base : MonoBehaviour
     [SerializeField] private UIButtonInvoker _buttonSetFlag;
 
     private readonly int _costToCreateWorker = 3;
-    private readonly int _costToCreateBase = 5;
+    private readonly int _costToCreateBase = 0;
     private Worker[] _workers = new Worker[5];
+    private WorkersSpawner _workersSpawner;
 
     private List<Ore> _ores = new List<Ore>();
 
@@ -34,6 +34,7 @@ public class Base : MonoBehaviour
     private void Awake()
     {
         _workers = new Worker[_maxAmountWorkers];
+        _workersSpawner = FindObjectOfType<WorkersSpawner>();
 
         _buttonSendToWork.Bind(new SendWorkersCommand(this));
         _buttonHireWorker.Bind(new HireWorkerCommand(this));
@@ -62,7 +63,7 @@ public class Base : MonoBehaviour
 
     private void GameOnGameStarted() =>
         _workersSpawner.Init(this);
-    
+
     public void DistributeWorkers()
     {
         _ores = _scanner.Scan();
@@ -149,10 +150,10 @@ public class Base : MonoBehaviour
             return;
 
         int index = Array.FindIndex(_workers, workerInstance => workerInstance == null);
-        
+
         worker.Init(_workersSpawnPoints[index].position, index);
         worker.transform.position = _workersSpawnPoints[index].position;
-        
+
         _workers[worker.NumberIndex] = worker;
     }
 
@@ -165,13 +166,12 @@ public class Base : MonoBehaviour
         {
             if (_workers[i] == worker)
             {
-                Debug.Log(i);
                 _workers[i] = null;
                 break;
             }
         }
     }
-    
+
     private Ore GetFreeOre()
     {
         foreach (var ore in _ores)

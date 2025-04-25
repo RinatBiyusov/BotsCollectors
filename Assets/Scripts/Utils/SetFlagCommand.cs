@@ -12,6 +12,6 @@
 
         public void Execute()
         {
-            _flagPlacementHandler.StartPlacingFlag(_base);
+            _flagPlacementHandler.PlaceFlag(_base);
         }
     }
